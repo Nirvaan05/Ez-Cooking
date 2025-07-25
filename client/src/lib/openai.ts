@@ -1,18 +1,5 @@
-import OpenAI from "openai";
 import { Recipe } from "@shared/schema";
 import { searchRecipesByIngredients } from "./recipeDatabase";
-
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const getOpenAIClient = () => {
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-  if (!apiKey || apiKey === "your-api-key-here") {
-    return null;
-  }
-  return new OpenAI({ 
-    apiKey,
-    dangerouslyAllowBrowser: true
-  });
-};
 
 export async function generateRecipes(
   ingredients: string[],
@@ -21,85 +8,33 @@ export async function generateRecipes(
   useAI: boolean = true
 ): Promise<Recipe[]> {
   try {
-    // If AI is disabled or unavailable, return database recipes
-    const openai = getOpenAIClient();
-    if (!useAI || !openai) {
+    if (!useAI) {
+      // Use database recipes when AI is disabled
       return await generateDatabaseRecipes(ingredients, dietaryPreferences, cookingTime);
     }
-    
-    // Build AI prompt with specific time constraints
-    let timeConstraint = "";
-    if (cookingTime) {
-      if (cookingTime.includes("15")) {
-        timeConstraint = "Each recipe must be completed in 15 minutes or less. Focus on quick cooking methods, minimal prep, and simple techniques.";
-      } else if (cookingTime.includes("30")) {
-        timeConstraint = "Each recipe should take no more than 30 minutes total cooking time.";
-      } else if (cookingTime.includes("60")) {
-        timeConstraint = "Each recipe should take no more than 60 minutes total cooking time.";
-      } else if (cookingTime.toLowerCase().includes("quick")) {
-        timeConstraint = "Focus on quick recipes that can be made in 15-20 minutes.";
-      }
-    }
 
-    let promptText = `Generate 3 unique, authentic recipes using these ingredients: ${ingredients.join(", ")}
-    
-    ${dietaryPreferences ? `Dietary preferences: ${dietaryPreferences}` : ""}
-    ${timeConstraint ? `TIME CONSTRAINT: ${timeConstraint}` : ""}
-
-    Please respond with exactly this JSON format:
-    {
-      "recipes": [
-        {
-          "title": "Recipe Name",
-          "description": "Brief description",
-          "cookTime": "30 minutes",
-          "servings": "4 servings",
-          "difficulty": "Easy",
-          "ingredients": [
-            {"name": "ingredient name", "amount": "1 cup"},
-            {"name": "ingredient name", "amount": "2 tbsp"}
-          ],
-          "instructions": [
-            "Step 1 instruction",
-            "Step 2 instruction"
-          ],
-          "tags": ["tag1", "tag2"]
-        }
-      ]
-    }`;
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: "You are a professional chef and recipe developer. Create detailed, practical recipes that are delicious and easy to follow."
-        },
-        {
-          role: "user",
-          content: promptText
-        }
-      ],
-      response_format: { type: "json_object" },
+    // Call backend AI endpoint
+    const response = await fetch("/api/recipes/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ingredients,
+        dietaryPreferences,
+        cookingTime,
+      }),
     });
 
-    const result = JSON.parse(response.choices[0].message.content || "{}");
-    
-    return result.recipes.map((recipe: any, index: number) => ({
-      id: `ai-recipe-${Date.now()}-${index}`,
-      title: recipe.title,
-      description: recipe.description,
-      cookTime: recipe.cookTime,
-      servings: recipe.servings,
-      difficulty: recipe.difficulty,
-      ingredients: recipe.ingredients,
-      instructions: recipe.instructions,
-      tags: recipe.tags || [],
-      isFavorite: false,
-      createdAt: new Date().toISOString(),
-    }));
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to generate AI recipes");
+    }
+
+    const recipes = await response.json();
+    return recipes;
   } catch (error) {
-    console.error("Error generating recipes:", error);
+    console.error("Error generating AI recipes:", error);
     // Fall back to database recipes if AI fails
     return await generateDatabaseRecipes(ingredients, dietaryPreferences, cookingTime);
   }

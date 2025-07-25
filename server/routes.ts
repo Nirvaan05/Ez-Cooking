@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertRecipeSchema } from "@shared/schema";
+import { generateAIRecipes } from "./openai";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -99,6 +100,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching recipes by tags:", error);
       res.status(500).json({ error: "Failed to fetch recipes by tags" });
+    }
+  });
+
+  // Generate AI recipes
+  app.post("/api/recipes/generate", async (req, res) => {
+    try {
+      const { ingredients, dietaryPreferences, cookingTime } = req.body;
+      if (!ingredients || !Array.isArray(ingredients)) {
+        return res.status(400).json({ error: "Ingredients array is required" });
+      }
+      
+      const recipes = await generateAIRecipes(ingredients, dietaryPreferences, cookingTime);
+      res.json(recipes);
+    } catch (error) {
+      console.error("Error generating AI recipes:", error);
+      res.status(500).json({ error: error instanceof Error ? error.message : "Failed to generate AI recipes" });
     }
   });
 
