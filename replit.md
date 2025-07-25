@@ -21,8 +21,8 @@ Preferred communication style: Simple, everyday language.
 ### Backend Architecture
 - **Framework**: Express.js with TypeScript
 - **Runtime**: Node.js with ES modules
-- **Database**: PostgreSQL with Drizzle ORM (configured but not actively used)
-- **Storage**: In-memory storage for user data (MemStorage class)
+- **Database**: PostgreSQL with Drizzle ORM (active production database)
+- **Storage**: PostgreSQL storage with advanced search capabilities (DatabaseStorage class)
 - **Development**: Hot module replacement with Vite integration
 
 ## Key Components
@@ -36,14 +36,16 @@ Preferred communication style: Simple, everyday language.
 
 ### Backend Components
 1. **Server Setup**: Express server with middleware for JSON parsing and logging
-2. **Storage Interface**: Abstract storage interface with in-memory implementation
-3. **Route Registration**: Modular route handling system (currently minimal)
-4. **Development Integration**: Vite middleware for hot reloading in development
+2. **Storage Interface**: Abstract storage interface with PostgreSQL implementation
+3. **Route Registration**: Complete API endpoints for recipe CRUD operations
+4. **Database Layer**: Drizzle ORM with optimized queries and search functionality
+5. **Development Integration**: Vite middleware for hot reloading in development
 
 ### Data Models
-- **Recipe Schema**: Comprehensive recipe structure with ingredients, instructions, metadata
-- **User Schema**: Basic user model (defined but not actively used)
+- **Recipe Schema**: Comprehensive recipe structure with ingredients, instructions, metadata stored in PostgreSQL
+- **User Schema**: User model with favorites relationship (ready for future features)
 - **Request Schemas**: Validation schemas for recipe generation requests
+- **Database Relations**: User favorites system with proper foreign key relationships
 
 ## Data Flow
 
