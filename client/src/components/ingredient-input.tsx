@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { PhotoUpload } from "./photo-upload";
 import { X, Plus, Sparkles, Database, Brain } from "lucide-react";
 
 interface IngredientInputProps {
@@ -22,6 +23,13 @@ export function IngredientInput({ onGenerateRecipes, isLoading }: IngredientInpu
       setIngredients([...ingredients, currentIngredient.trim()]);
       setCurrentIngredient("");
     }
+  };
+
+  const addIngredientsFromPhoto = (recognizedIngredients: string[]) => {
+    const newIngredients = recognizedIngredients.filter(
+      ingredient => !ingredients.includes(ingredient.trim())
+    );
+    setIngredients([...ingredients, ...newIngredients]);
   };
 
   const removeIngredient = (ingredient: string) => {
@@ -48,25 +56,34 @@ export function IngredientInput({ onGenerateRecipes, isLoading }: IngredientInpu
   return (
     <div className="max-w-2xl mx-auto">
       <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1">
-            <Input
-              type="text"
-              placeholder="Type an ingredient..."
-              value={currentIngredient}
-              onChange={(e) => setCurrentIngredient(e.target.value)}
-              onKeyPress={handleKeyPress}
-              className="h-12 text-base"
-            />
+        {/* Photo Upload Section */}
+        <div className="mb-6">
+          <PhotoUpload onIngredientsRecognized={addIngredientsFromPhoto} />
+        </div>
+
+        {/* Manual Input Section */}
+        <div className="border-t pt-6">
+          <h4 className="text-sm font-medium text-gray-700 mb-4">Or add ingredients manually</h4>
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex-1">
+              <Input
+                type="text"
+                placeholder="Type an ingredient..."
+                value={currentIngredient}
+                onChange={(e) => setCurrentIngredient(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className="h-12 text-base"
+              />
+            </div>
+            <Button
+              onClick={addIngredient}
+              disabled={!currentIngredient.trim()}
+              className="bg-[hsl(16,84%,60%)] hover:bg-[hsl(16,84%,55%)] text-white h-12 px-6"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add
+            </Button>
           </div>
-          <Button
-            onClick={addIngredient}
-            disabled={!currentIngredient.trim()}
-            className="bg-[hsl(16,84%,60%)] hover:bg-[hsl(16,84%,55%)] text-white h-12 px-6"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add
-          </Button>
         </div>
         
         {ingredients.length > 0 && (
