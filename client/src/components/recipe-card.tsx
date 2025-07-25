@@ -9,34 +9,16 @@ interface RecipeCardProps {
 }
 
 export function RecipeCard({ recipe, onViewRecipe, onToggleFavorite }: RecipeCardProps) {
-  const getRecipeImage = (title: string) => {
-    // Generate a consistent image URL based on recipe title
-    const imageKeywords = title.toLowerCase().includes('chicken') ? 'chicken' :
-                         title.toLowerCase().includes('beef') ? 'beef' :
-                         title.toLowerCase().includes('fish') ? 'fish' :
-                         title.toLowerCase().includes('pasta') ? 'pasta' :
-                         title.toLowerCase().includes('salad') ? 'salad' :
-                         title.toLowerCase().includes('soup') ? 'soup' :
-                         'food';
-    
-    return `https://images.unsplash.com/photo-1546793665-c74683f339c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400&q=80`;
-  };
-
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-      <img
-        src={recipe.image || getRecipeImage(recipe.title)}
-        alt={recipe.title}
-        className="w-full h-48 object-cover"
-      />
+    <div className="bg-white rounded-lg border border-gray-200 hover:border-[hsl(16,84%,60%)] transition-all duration-300 hover:shadow-md">
       <div className="p-6">
-        <div className="flex justify-between items-start mb-3">
-          <h3 className="text-xl font-semibold text-[hsl(210,22%,22%)] line-clamp-2">
+        <div className="flex justify-between items-start mb-4">
+          <h3 className="text-lg font-semibold text-[hsl(210,22%,22%)] line-clamp-2 flex-1 mr-2">
             {recipe.title}
           </h3>
           <button
             onClick={() => onToggleFavorite(recipe.id)}
-            className={`transition-colors ${
+            className={`transition-colors shrink-0 ${
               recipe.isFavorite 
                 ? "text-red-500" 
                 : "text-gray-400 hover:text-red-500"
@@ -46,27 +28,57 @@ export function RecipeCard({ recipe, onViewRecipe, onToggleFavorite }: RecipeCar
           </button>
         </div>
         
-        <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
+        <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
           <span className="flex items-center">
-            <Clock className="h-4 w-4 mr-1" />
+            <Clock className="h-4 w-4 mr-1 text-[hsl(16,84%,60%)]" />
             {recipe.cookTime}
           </span>
           <span className="flex items-center">
-            <Users className="h-4 w-4 mr-1" />
+            <Users className="h-4 w-4 mr-1 text-[hsl(16,84%,60%)]" />
             {recipe.servings}
           </span>
           <span className="flex items-center">
-            <BarChart3 className="h-4 w-4 mr-1" />
+            <BarChart3 className="h-4 w-4 mr-1 text-[hsl(16,84%,60%)]" />
             {recipe.difficulty}
           </span>
         </div>
         
-        <p className="text-gray-600 mb-4 line-clamp-3">
-          {recipe.description}
-        </p>
+        {/* Quick ingredients preview */}
+        <div className="mb-4">
+          <p className="text-xs font-medium text-gray-500 mb-2">MAIN INGREDIENTS</p>
+          <div className="flex flex-wrap gap-1">
+            {recipe.ingredients.slice(0, 4).map((ingredient, index) => (
+              <span
+                key={index}
+                className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs"
+              >
+                {ingredient.name}
+              </span>
+            ))}
+            {recipe.ingredients.length > 4 && (
+              <span className="text-xs text-gray-500">+{recipe.ingredients.length - 4} more</span>
+            )}
+          </div>
+        </div>
+
+        {/* Steps preview */}
+        <div className="mb-4">
+          <p className="text-xs font-medium text-gray-500 mb-2">QUICK STEPS</p>
+          <div className="space-y-1">
+            {recipe.instructions.slice(0, 2).map((step, index) => (
+              <div key={index} className="flex gap-2 text-sm">
+                <span className="text-[hsl(16,84%,60%)] font-medium shrink-0">{index + 1}.</span>
+                <span className="text-gray-600 line-clamp-1">{step}</span>
+              </div>
+            ))}
+            {recipe.instructions.length > 2 && (
+              <p className="text-xs text-gray-500 pl-4">+{recipe.instructions.length - 2} more steps</p>
+            )}
+          </div>
+        </div>
         
         <div className="flex justify-between items-center">
-          <div className="flex space-x-2">
+          <div className="flex gap-1">
             {recipe.tags.slice(0, 2).map((tag) => (
               <span
                 key={tag}
@@ -78,11 +90,10 @@ export function RecipeCard({ recipe, onViewRecipe, onToggleFavorite }: RecipeCar
           </div>
           <Button
             onClick={() => onViewRecipe(recipe)}
-            variant="ghost"
-            className="text-[hsl(16,84%,60%)] hover:text-[hsl(16,84%,55%)] font-medium p-0 h-auto"
+            className="bg-[hsl(16,84%,60%)] hover:bg-[hsl(16,84%,55%)] text-white text-sm h-8"
           >
-            View Recipe
-            <ArrowRight className="h-4 w-4 ml-1" />
+            View Full Recipe
+            <ArrowRight className="h-3 w-3 ml-1" />
           </Button>
         </div>
       </div>

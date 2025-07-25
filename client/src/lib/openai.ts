@@ -27,11 +27,24 @@ export async function generateRecipes(
       return await generateDatabaseRecipes(ingredients, dietaryPreferences, cookingTime);
     }
     
-    // Build AI prompt
+    // Build AI prompt with specific time constraints
+    let timeConstraint = "";
+    if (cookingTime) {
+      if (cookingTime.includes("15")) {
+        timeConstraint = "Each recipe must be completed in 15 minutes or less. Focus on quick cooking methods, minimal prep, and simple techniques.";
+      } else if (cookingTime.includes("30")) {
+        timeConstraint = "Each recipe should take no more than 30 minutes total cooking time.";
+      } else if (cookingTime.includes("60")) {
+        timeConstraint = "Each recipe should take no more than 60 minutes total cooking time.";
+      } else if (cookingTime.toLowerCase().includes("quick")) {
+        timeConstraint = "Focus on quick recipes that can be made in 15-20 minutes.";
+      }
+    }
+
     let promptText = `Generate 3 unique, authentic recipes using these ingredients: ${ingredients.join(", ")}
     
     ${dietaryPreferences ? `Dietary preferences: ${dietaryPreferences}` : ""}
-    ${cookingTime ? `Preferred cooking time: ${cookingTime}` : ""}
+    ${timeConstraint ? `TIME CONSTRAINT: ${timeConstraint}` : ""}
 
     Please respond with exactly this JSON format:
     {
