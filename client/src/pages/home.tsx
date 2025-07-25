@@ -26,20 +26,21 @@ export default function Home() {
   const handleGenerateRecipes = async (
     ingredients: string[],
     dietaryPreferences?: string,
-    cookingTime?: string
+    cookingTime?: string,
+    useAI: boolean = true
   ) => {
     setIsLoading(true);
     setCurrentIngredients(ingredients);
     try {
-      const recipes = await generateRecipes(ingredients, dietaryPreferences, cookingTime);
+      const recipes = await generateRecipes(ingredients, dietaryPreferences, cookingTime, useAI);
       setGeneratedRecipes(recipes);
       toast({
-        title: "Recipes generated!",
-        description: `Found ${recipes.length} delicious AI-powered recipes for you.`,
+        title: "Recipes found!",
+        description: `Found ${recipes.length} delicious ${useAI ? 'AI-generated' : 'database'} recipes for you.`,
       });
     } catch (error) {
       toast({
-        title: "Error generating recipes",
+        title: "Error finding recipes",
         description: error instanceof Error ? error.message : "An unexpected error occurred.",
         variant: "destructive",
       });

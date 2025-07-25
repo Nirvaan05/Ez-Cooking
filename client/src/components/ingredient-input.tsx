@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X, Plus, Sparkles } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { X, Plus, Sparkles, Database, Brain } from "lucide-react";
 
 interface IngredientInputProps {
-  onGenerateRecipes: (ingredients: string[], dietaryPreferences?: string, cookingTime?: string) => void;
+  onGenerateRecipes: (ingredients: string[], dietaryPreferences?: string, cookingTime?: string, useAI?: boolean) => void;
   isLoading: boolean;
 }
 
@@ -14,6 +15,7 @@ export function IngredientInput({ onGenerateRecipes, isLoading }: IngredientInpu
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [dietaryPreferences, setDietaryPreferences] = useState<string>("none");
   const [cookingTime, setCookingTime] = useState<string>("any");
+  const [useAI, setUseAI] = useState<boolean>(true);
 
   const addIngredient = () => {
     if (currentIngredient.trim() && !ingredients.includes(currentIngredient.trim())) {
@@ -31,7 +33,8 @@ export function IngredientInput({ onGenerateRecipes, isLoading }: IngredientInpu
       onGenerateRecipes(
         ingredients, 
         dietaryPreferences && dietaryPreferences !== "none" ? dietaryPreferences : undefined, 
-        cookingTime && cookingTime !== "any" ? cookingTime : undefined
+        cookingTime && cookingTime !== "any" ? cookingTime : undefined,
+        useAI
       );
     }
   };
@@ -86,6 +89,37 @@ export function IngredientInput({ onGenerateRecipes, isLoading }: IngredientInpu
         )}
         
         <div className="border-t pt-4">
+          {/* AI Toggle */}
+          <div className="flex items-center justify-between mb-6 p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center space-x-3">
+              {useAI ? (
+                <Brain className="h-5 w-5 text-[hsl(16,84%,60%)]" />
+              ) : (
+                <Database className="h-5 w-5 text-[hsl(145,63%,42%)]" />
+              )}
+              <div>
+                <label className="font-medium text-gray-900">
+                  {useAI ? "AI Generation" : "Database Search"}
+                </label>
+                <p className="text-sm text-gray-600">
+                  {useAI 
+                    ? "Use AI to create new recipes with your ingredients" 
+                    : "Find authentic recipes from our database"
+                  }
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <span className="text-sm text-gray-600">Database</span>
+              <Switch 
+                checked={useAI} 
+                onCheckedChange={setUseAI}
+                className="data-[state=checked]:bg-[hsl(16,84%,60%)]"
+              />
+              <span className="text-sm text-gray-600">AI</span>
+            </div>
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -131,8 +165,17 @@ export function IngredientInput({ onGenerateRecipes, isLoading }: IngredientInpu
         disabled={ingredients.length === 0 || isLoading}
         className="bg-gradient-to-r from-[hsl(16,84%,60%)] to-[hsl(33,87%,54%)] text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300 h-auto"
       >
-        <Sparkles className="h-5 w-5 mr-3" />
-        {isLoading ? "Generating Recipes..." : "Generate Recipes with AI"}
+        {useAI ? (
+          <Brain className="h-5 w-5 mr-3" />
+        ) : (
+          <Database className="h-5 w-5 mr-3" />
+        )}
+        {isLoading 
+          ? "Finding Recipes..." 
+          : useAI 
+            ? "Generate Recipes with AI" 
+            : "Find Database Recipes"
+        }
       </Button>
     </div>
   );
