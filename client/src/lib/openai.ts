@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { Recipe } from "@shared/schema";
+import { findRecipesByIngredients, loadRecipeDatabase, convertToRecipeFormat, getAvailableCuisines } from "./recipeDatabase";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ 
@@ -13,20 +14,44 @@ export async function generateRecipes(
   cookingTime?: string
 ): Promise<Recipe[]> {
   try {
-    const prompt = `Generate 3 unique recipes using these ingredients: ${ingredients.join(", ")}
+    // Ensure database is loaded
+    await loadRecipeDatabase();
+    
+    // Find similar recipes from database for inspiration
+    const databaseMatches = findRecipesByIngredients(ingredients, 5);
+    const availableCuisines = getAvailableCuisines();
+    
+    // Build enhanced prompt with database context
+    let prompt = `Generate 3 unique, authentic recipes using these ingredients: ${ingredients.join(", ")}
     
     ${dietaryPreferences ? `Dietary preferences: ${dietaryPreferences}` : ""}
-    ${cookingTime ? `Preferred cooking time: ${cookingTime}` : ""}
+    ${cookingTime ? `Preferred cooking time: ${cookingTime}` : ""}`;
+
+    // Add database context for better authenticity
+    if (databaseMatches.length > 0) {
+      prompt += `\n\nFor inspiration, here are some authentic recipes that use similar ingredients:`;
+      databaseMatches.forEach((match, index) => {
+        prompt += `\n${index + 1}. ${match.cuisine} cuisine with ingredients: ${match.ingredients.slice(0, 8).join(", ")}`;
+      });
+      prompt += `\n\nUse these as inspiration for authentic flavor combinations and cooking techniques.`;
+    }
+
+    if (availableCuisines.length > 0) {
+      const popularCuisines = availableCuisines.slice(0, 10);
+      prompt += `\n\nAvailable authentic cuisines include: ${popularCuisines.join(", ")}. Consider these styles for authentic recipes.`;
+    }
+
+    prompt += `
     
     For each recipe, provide:
-    - A creative and appealing title
-    - A brief description (2-3 sentences)
+    - A creative and appealing title that reflects authentic cuisine
+    - A brief description (2-3 sentences) highlighting the dish's origin or style
     - Cook time in format like "25 min" or "1 hour 30 min"
     - Number of servings like "4 servings"
     - Difficulty level: "Easy", "Medium", or "Hard"
-    - Complete ingredient list with amounts
-    - Step-by-step instructions
-    - 2-3 relevant tags describing the recipe
+    - Complete ingredient list with realistic amounts
+    - Step-by-step instructions with proper cooking techniques
+    - 2-3 relevant tags (cuisine type, cooking method, etc.)
     
     Return the response as a JSON object with this exact structure:
     {

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a full-stack web application that generates personalized recipes using AI. Users can input ingredients they have available, specify dietary preferences and cooking time constraints, and receive tailored recipe suggestions. The app features a modern React frontend with a Node.js/Express backend, using OpenAI's GPT-4o model for recipe generation.
+This is a comprehensive recipe generation web application that combines AI-powered recipe creation with a rich database of authentic recipes. Users can input ingredients they have available, specify dietary preferences and cooking time constraints, and receive both AI-generated recipes and authentic dishes from a database of 39,774+ real recipes. The app features a modern React frontend with OpenAI's GPT-4o model for intelligent recipe generation, enhanced by a comprehensive recipe database for authentic culinary inspiration.
 
 ## User Preferences
 
@@ -31,7 +31,8 @@ Preferred communication style: Simple, everyday language.
 1. **IngredientInput**: Form component for collecting ingredients and preferences
 2. **RecipeCard**: Display component for recipe previews with favorite functionality
 3. **RecipeModal**: Detailed recipe view with full instructions and ingredients
-4. **UI Library**: Complete set of shadcn/ui components (buttons, dialogs, forms, etc.)
+4. **DatabaseRecipes**: Component displaying authentic recipes from database with filtering
+5. **UI Library**: Complete set of shadcn/ui components (buttons, dialogs, forms, etc.)
 
 ### Backend Components
 1. **Server Setup**: Express server with middleware for JSON parsing and logging
@@ -46,20 +47,27 @@ Preferred communication style: Simple, everyday language.
 
 ## Data Flow
 
-1. **Recipe Generation Flow**:
+1. **AI Recipe Generation Flow**:
    - User inputs ingredients and preferences in IngredientInput component
-   - Frontend calls OpenAI API directly (client-side integration)
+   - Frontend loads recipe database for contextual AI prompting
+   - Enhanced prompts sent to OpenAI API with database-inspired context
    - Generated recipes are stored in component state and localStorage
    - Recipes display in RecipeCard components with favorite functionality
 
-2. **Local Storage**:
+2. **Database Recipe Discovery**:
+   - Recipe database (39,774+ recipes) loads automatically on app start
+   - DatabaseRecipes component shows authentic recipes matching user ingredients
+   - Filtering by cuisine type and ingredient matching algorithms
+   - Database entries converted to full Recipe format for consistent display
+
+3. **Local Storage**:
    - Saved recipes persist in browser localStorage
    - Favorite status toggles update localStorage immediately
-   - No backend persistence currently implemented
+   - Both AI-generated and database recipes can be saved
 
-3. **State Management**:
+4. **State Management**:
    - TanStack Query manages API calls and caching
-   - Local React state handles UI interactions
+   - Local React state handles UI interactions and database filtering
    - Toast notifications provide user feedback
 
 ## External Dependencies

@@ -3,6 +3,7 @@ import { Recipe } from "@shared/schema";
 import { IngredientInput } from "@/components/ingredient-input";
 import { RecipeCard } from "@/components/recipe-card";
 import { RecipeModal } from "@/components/recipe-modal";
+import { DatabaseRecipes } from "@/components/database-recipes";
 import { generateRecipes } from "@/lib/openai";
 import { getSavedRecipes, saveRecipe, toggleRecipeFavorite } from "@/lib/storage";
 import { useToast } from "@/hooks/use-toast";
@@ -15,6 +16,7 @@ export default function Home() {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentIngredients, setCurrentIngredients] = useState<string[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -27,12 +29,13 @@ export default function Home() {
     cookingTime?: string
   ) => {
     setIsLoading(true);
+    setCurrentIngredients(ingredients);
     try {
       const recipes = await generateRecipes(ingredients, dietaryPreferences, cookingTime);
       setGeneratedRecipes(recipes);
       toast({
         title: "Recipes generated!",
-        description: `Found ${recipes.length} delicious recipes for you.`,
+        description: `Found ${recipes.length} delicious AI-powered recipes for you.`,
       });
     } catch (error) {
       toast({
@@ -132,7 +135,7 @@ export default function Home() {
             What's in your fridge?
           </h2>
           <p className="text-xl text-gray-600 mb-8">
-            Add your ingredients and let AI create amazing recipes for you
+            Add your ingredients and discover AI-generated recipes plus authentic dishes from our database
           </p>
           
           <IngredientInput 
@@ -153,7 +156,7 @@ export default function Home() {
         {generatedRecipes.length > 0 && !isLoading && (
           <div className="mb-12">
             <h3 className="text-2xl font-bold text-[hsl(210,22%,22%)] mb-6">
-              Generated Recipes
+              AI-Generated Recipes
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {generatedRecipes.map((recipe) => (
@@ -167,6 +170,15 @@ export default function Home() {
             </div>
           </div>
         )}
+
+        {/* Database Recipe Suggestions */}
+        <div className="mb-12">
+          <DatabaseRecipes
+            userIngredients={currentIngredients}
+            onViewRecipe={handleViewRecipe}
+            onToggleFavorite={handleToggleFavorite}
+          />
+        </div>
 
         {/* Saved Recipes */}
         {savedRecipes.length > 0 && (
