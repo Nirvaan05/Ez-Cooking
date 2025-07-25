@@ -61,6 +61,7 @@ Preferred communication style: Simple, everyday language.
    - Real-time search queries match user ingredients against database
    - Advanced filtering by cuisine type, dietary preferences, and cooking time
    - Database entries returned in full Recipe format for consistent display
+   - Old JSON dataset files removed - now exclusively using Food.com data
 
 3. **Local Storage**:
    - Saved recipes persist in browser localStorage
