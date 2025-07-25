@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertRecipeSchema } from "@shared/schema";
 import { generateAIRecipes } from "./openai";
+import { recognizeIngredients } from "./vision";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -116,6 +117,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error generating AI recipes:", error);
       res.status(500).json({ error: error instanceof Error ? error.message : "Failed to generate AI recipes" });
+    }
+  });
+
+  // Recognize ingredients from image
+  app.post("/api/ingredients/recognize", async (req, res) => {
+    try {
+      const { image } = req.body;
+      if (!image || typeof image !== 'string') {
+        return res.status(400).json({ error: "Base64 image data is required" });
+      }
+      
+      // Remove data URL prefix if present
+      const base64Data = image.replace(/^data:image\/[a-z]+;base64,/, '');
+      
+      const ingredients = await recognizeIngredients(base64Data);
+      res.json({ ingredients });
+    } catch (error) {
+      console.error("Error recognizing ingredients:", error);
+      res.status(500).json({ error: error instanceof Error ? error.message : "Failed to recognize ingredients" });
     }
   });
 
