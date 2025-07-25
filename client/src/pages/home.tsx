@@ -79,14 +79,14 @@ export default function Home() {
       // Update generated recipes if the recipe is in that list
       setGeneratedRecipes(prev => 
         prev.map(recipe => 
-          recipe.id === recipeId 
+          String(recipe.id) === String(recipeId) 
             ? { ...recipe, isFavorite: !recipe.isFavorite }
             : recipe
         )
       );
       
       // Update selected recipe if it's the one being toggled
-      if (selectedRecipe && selectedRecipe.id === recipeId) {
+      if (selectedRecipe && String(selectedRecipe.id) === String(recipeId)) {
         setSelectedRecipe({ ...selectedRecipe, isFavorite: !selectedRecipe.isFavorite });
       }
     } catch (error) {

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a comprehensive recipe generation web application that combines AI-powered recipe creation with a rich database of authentic recipes. Users can input ingredients they have available, specify dietary preferences and cooking time constraints, and receive both AI-generated recipes and authentic dishes from a database of 39,774+ real recipes. The app features a modern React frontend with OpenAI's GPT-4o model for intelligent recipe generation, enhanced by a comprehensive recipe database for authentic culinary inspiration.
+This is a comprehensive recipe generation web application that combines AI-powered recipe creation with a rich PostgreSQL database of authentic Food.com recipes. Users can input ingredients they have available, specify dietary preferences and cooking time constraints, and receive both AI-generated recipes and authentic dishes from a database of 3,999+ real Food.com recipes. The app features a modern React frontend with OpenAI's GPT-4o model for intelligent recipe generation, enhanced by a PostgreSQL database with advanced search capabilities for authentic culinary inspiration.
 
 ## User Preferences
 
@@ -57,10 +57,10 @@ Preferred communication style: Simple, everyday language.
    - Recipes display in RecipeCard components with favorite functionality
 
 2. **Database Recipe Discovery**:
-   - Recipe database (39,774+ recipes) loads automatically on app start
-   - DatabaseRecipes component shows authentic recipes matching user ingredients
-   - Filtering by cuisine type and ingredient matching algorithms
-   - Database entries converted to full Recipe format for consistent display
+   - PostgreSQL database with 3,999+ authentic Food.com recipes accessible via API
+   - Real-time search queries match user ingredients against database
+   - Advanced filtering by cuisine type, dietary preferences, and cooking time
+   - Database entries returned in full Recipe format for consistent display
 
 3. **Local Storage**:
    - Saved recipes persist in browser localStorage

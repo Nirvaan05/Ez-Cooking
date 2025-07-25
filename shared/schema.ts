@@ -30,35 +30,7 @@ export const recipes = pgTable("recipes", {
   }
 });
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: varchar("username", { length: 255 }).unique().notNull(),
-  email: varchar("email", { length: 255 }).unique(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-// Relations
-export const usersRelations = relations(users, ({ many }) => ({
-  favoriteRecipes: many(userFavorites),
-}));
-
-export const userFavorites = pgTable("user_favorites", {
-  id: serial("id").primaryKey(),
-  userId: serial("user_id").references(() => users.id),
-  recipeId: serial("recipe_id").references(() => recipes.id),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-export const userFavoritesRelations = relations(userFavorites, ({ one }) => ({
-  user: one(users, {
-    fields: [userFavorites.userId],
-    references: [users.id],
-  }),
-  recipe: one(recipes, {
-    fields: [userFavorites.recipeId],
-    references: [recipes.id],
-  }),
-}));
+// User-related tables removed per user request - focusing only on recipes
 
 // Zod schemas
 export const insertRecipeSchema = createInsertSchema(recipes, {
@@ -77,10 +49,7 @@ export const selectRecipeSchema = createSelectSchema(recipes, {
   tags: z.array(z.string()),
 });
 
-export const insertUserSchema = createInsertSchema(users).omit({
-  id: true,
-  createdAt: true,
-});
+// User schemas removed per user request
 
 export const generateRecipeRequestSchema = z.object({
   ingredients: z.array(z.string()),
@@ -89,9 +58,10 @@ export const generateRecipeRequestSchema = z.object({
 });
 
 // Types
-export type Recipe = z.infer<typeof selectRecipeSchema>;
+export type Recipe = z.infer<typeof selectRecipeSchema> & {
+  id: number | string; // Allow both for compatibility
+};
 export type InsertRecipe = z.infer<typeof insertRecipeSchema>;
 export type RecipeIngredient = z.infer<typeof recipeIngredientSchema>;
-export type User = typeof users.$inferSelect;
-export type InsertUser = z.infer<typeof insertUserSchema>;
+// User types removed per user request
 export type GenerateRecipeRequest = z.infer<typeof generateRecipeRequestSchema>;
