@@ -10,6 +10,12 @@ Welcome to Ez Chef, the app that finally solves the ultimate kitchen puzzle: "Wh
 -   **Modern UI**: A sleek, responsive interface with fancy drag-and-drop functionality that's a pleasure to use.
 -   **Local Storage**: Your secret family recipes are safe and sound on your local machine with an SQLite database.
 
+## Screenshot
+
+![App Screenshot](static/uploads/screenshot-recipe.png)
+![App Screenshot](static/uploads/screenshot-upload.png)
+![App Screenshot](static/uploads/screenshot-homepage.png)
+
 ## 🛠️ Tech Stack
 
 -   **Backend**: Python Flask
