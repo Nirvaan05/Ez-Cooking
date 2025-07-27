@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ez cooking - Recipe Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-utensils"></i> Ez cooking</h1>
+            <p>Your AI-powered recipe manager</p>
+        </header>
+
+        <nav class="nav">
+            <button class="nav-btn active" data-tab="recipes">
+                <i class="fas fa-book-open"></i> My Recipes
+            </button>
+            <button class="nav-btn" data-tab="upload">
+                <i class="fas fa-camera"></i> Upload Photo
+            </button>
+            <button class="nav-btn" data-tab="generate">
+                <i class="fas fa-magic"></i> Generate Recipe
+            </button>
+        </nav>
+
+        <main class="main">
+            <!-- Recipes Tab -->
+            <div id="recipes" class="tab-content active">
+                <div class="recipes-header">
+                    <h2>My Recipes</h2>
+                    <button class="btn btn-primary" onclick="showAddRecipeModal()">
+                        <i class="fas fa-plus"></i> Add Recipe
+                    </button>
+                </div>
+                <div id="recipes-grid" class="recipes-grid">
+                    <!-- Recipes will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Upload Photo Tab -->
+            <div id="upload" class="tab-content">
+                <div class="upload-section">
+                    <h2>Upload Recipe Photo</h2>
+                    <p>Take a photo of your dish and let AI analyze it to create a recipe!</p>
+                    
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload or drag and drop an image</p>
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                    </div>
+                    
+                    <div id="uploadPreview" class="upload-preview" style="display: none;">
+                        <img id="previewImage" src="" alt="Preview">
+                        <button class="btn btn-primary" onclick="analyzeImage()">
+                            <i class="fas fa-search"></i> Analyze Image
+                        </button>
+                    </div>
+                    
+                    <div id="uploadResult" class="upload-result" style="display: none;">
+                        <!-- Analysis result will be shown here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generate Recipe Tab -->
+            <div id="generate" class="tab-content">
+                <div class="generate-section">
+                    <h2>Generate Recipe from Ingredients</h2>
+                    <p>Enter the ingredients you have and let AI create a delicious recipe!</p>
+                    
+                    <div class="ingredients-input">
+                        <div class="input-group">
+                            <input type="text" id="ingredientInput" placeholder="Enter an ingredient...">
+                            <button class="btn btn-secondary" onclick="addIngredient()">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                        
+                        <div id="ingredientsList" class="ingredients-list">
+                            <!-- Ingredients will be listed here -->
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="generateRecipe()" id="generateBtn" disabled>
+                            <i class="fas fa-magic"></i> Generate Recipe
+                        </button>
+                    </div>
+                    
+                    <div id="generatedRecipe" class="generated-recipe" style="display: none;">
+                        <!-- Generated recipe will be shown here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Recipe Modal -->
+    <div id="recipeModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Recipe</h3>
+                <span class="close" onclick="closeRecipeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="recipeForm">
+                    <div class="form-group">
+                        <label for="recipeTitle">Title</label>
+                        <input type="text" id="recipeTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="recipeDescription">Description</label>
+                        <textarea id="recipeDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="recipeIngredients">Ingredients (one per line)</label>
+                        <textarea id="recipeIngredients" rows="5" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="recipeInstructions">Instructions</label>
+                        <textarea id="recipeInstructions" rows="8" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="recipeCookingTime">Cooking Time (minutes)</label>
+                            <input type="number" id="recipeCookingTime" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="recipeServings">Servings</label>
+                            <input type="number" id="recipeServings" min="1">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="recipeDifficulty">Difficulty</label>
+                            <select id="recipeDifficulty">
+                                <option value="Easy">Easy</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Hard">Hard</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="recipeCuisine">Cuisine</label>
+                            <input type="text" id="recipeCuisine">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeRecipeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Recipe</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recipe Detail Modal -->
+    <div id="recipeDetailModal" class="modal" style="display: none;">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="detailTitle"></h3>
+                <span class="close" onclick="closeRecipeDetailModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="recipeDetailContent">
+                    <!-- Recipe details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Processing...</p>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html> 
